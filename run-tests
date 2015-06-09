@@ -1,0 +1,54 @@
+#!/bin/bash
+echo ### Cleaning ###
+xbuild /nologo /property:Configuration=Release /property:Platform=x64 /target:Clean >/dev/null
+xbuild /nologo /property:Configuration=Debug /property:Platform=x64 /target:Clean >/dev/null
+xbuild /nologo /property:Configuration=Release /property:Platform=x86 /target:Clean >/dev/null
+xbuild /nologo /property:Configuration=Debug /property:Platform=x86 /target:Clean >/dev/null
+echo ### Building ###
+xbuild /property:Configuration=Release /property:Platform=x64 /target:Build  >/dev/null
+xbuild /property:Configuration=Debug /property:Platform=x64 /target:Build  >/dev/null
+xbuild /property:Configuration=Release /property:Platform=x86 /target:Build  >/dev/null
+xbuild /property:Configuration=Debug /property:Platform=x86 /target:Build  >/dev/null
+clear
+
+pushd bin
+
+path_temp=$PATH
+export PATH=$HOME/mono/mono-llvm-64/bin:$PATH
+echo ~~~~~~~~~~~~~~~~~~~
+mono --version
+echo ~~~~~~~~~~~~~~~~~~~
+
+for filename in `ls *x64*.exe`
+do
+	echo
+	echo $filename
+	echo ~~~~~~~~~~~~~~~~~~~
+	mono $filename
+	echo
+	echo $filename with LLVM
+	echo ~~~~~~~~~~~~~~~~~~~
+	mono --llvm $filename
+done
+
+export PATH=$path_temp
+export PATH=$HOME/mono/mono-llvm-32/bin:$PATH
+echo ~~~~~~~~~~~~~~~~~~~
+mono --version
+echo ~~~~~~~~~~~~~~~~~~~
+
+for filename in `ls *x86*.exe`
+do
+	echo
+	echo $filename
+	echo ~~~~~~~~~~~~~~~~~~~
+	mono $filename
+	echo
+	echo $filename with LLVM
+	echo ~~~~~~~~~~~~~~~~~~~
+	mono --llvm $filename
+done
+
+popd
+
+export PATH=$path_temp
